@@ -1,5 +1,5 @@
 FORMAT: 1A
-HOST: http://agendaservice12.apiblueprint.org/
+HOST: https://localhost:8080
 
 # AgendaService
 
@@ -7,46 +7,64 @@ AgendaService is a simple API allowing users to manage their schedules online.
 
 # Group User
 
-Resource operations related to a user in the API.
-
 A User object has the following attributes:
 
 + username (string)
 + password (string)
 + email (string)
 
+  
+# Group Access Authorization and Control
 
-## AgendaService API Root [/]
+Access and Control of Authorization.
 
-### User Log In [POST /login]
+## Authentication [/v1/auth{?username,password,token}]
 
-To log in. It takes a JSON object containing the username and the  password of a user as parament.
+Authorization Resource represents an authorization granted to the user. You can **only** access your own authorization.
 
-+ username (string) - User's name
-+ password (string) - User's password
+The Authorization Resource has the following attribute:
 
-+ Request (application/json)
++ token
+
+
+### Retrieve Authorization [GET]
+
+Get an Authentication token for operations later. It takes a JSON object containing a username and a password of as parament. If fails, the token should be empty.
+
++ Parameters
+    - username : `VinaLx` (string, required) - User Name
+    - password : `vpass` (string, required) - User Password
+
+
++ Response 200 (application/json)
 
         {
-            "username":"VinaLx"
-            "password":"vpass"
+            "token":"1a2b3c"
         }
 
-+ Response 201 (application/json)
 
-    + Headers
+### Remove an Authorization [DELETE]
 
-            Location: /welcome
+Remove an Authorization token from database.
 
-    + Body
++ Parameters
+    - token : `1a2b3c` (string, required) - Auth Token
 
-            {
-                "token":"1a2b3c"
-            }
++ Response 204
 
-### User Register [POST /register]
 
-To register a new account. It takes a JSON object containing a username, a password and a email address as its parament. The username should be unique.
+# Group Users
+
+Resources related to a users collection in the API.
+
+## Users Collection [/v1/users{?token}]
+  
+It contains the operations of users collection.
+
+
+### Create A User [POST]
+
+To create a new account. It takes a JSON object containing a username, a password and a email address as its parament. The username should be unique.
 
 + username (string) - User's name
 + password (string) - User's password
@@ -62,29 +80,18 @@ To register a new account. It takes a JSON object containing a username, a passw
 
 + Response 201 (application/json)
 
-    + Headers
-
-            Location: /welcome
-
-    + Body
-
-            {
-                "username":"VinaLx"
-                "password":"vpass"
-                "email":"VinaLx@mail2.sysu.edu.cn"
-            }
-
-
-## User Operations [/welcome{?token}]
-
-It contains the operations of a user when logged in. The token was generated after logged in.
-
-+ Parameters
-    - token : `1a2b3c` (string, required) - Auth Token
+        {
+            "username":"VinaLx"
+            "password":"vpass"
+            "email":"VinaLx@mail2.sysu.edu.cn"
+        }
 
 ### List all Users [GET]
 
 To view all the users.
+
++ Parameters
+    - token : `1a2b3c` (string, required) - Auth Token
 
 + Response 200 (application/json)
 
@@ -103,15 +110,9 @@ To view all the users.
                 "email":"Jarvis@mail2.sysu.edu.cn"
             }
         ]
+   
+### Delete a User [DELETE /v1/users/{username}]
 
-### User Log Out [POST]
-
-To log out and the token will be removed.
-
-+ Response 204
-
-### Delete a User [DELETE]
-
-To delete the user account from database.
+To delete the user account with username from database.
 
 + Response 204
