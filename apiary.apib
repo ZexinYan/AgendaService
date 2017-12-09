@@ -11,38 +11,74 @@ Resource operations related to a user in the API.
 
 A User object has the following attributes:
 
-+ id (int)
 + username (string)
 + password (string)
 + email (string)
 
 
-## User-Key [/user/getkey{?username,password}]
+## User Authorization [/]
 
-+ Parameters
-    - username : `root` (string, required) - User Name
-    - password : `pass` (string, required) - User Password
+### User Log In [POST /login]
 
-### Get User Key [GET]
+To log in. It takes a JSON object containing the username and the  password of a user as parament.
 
-get a security key for operations later.
++ username (string) - User's name
++ password (string) - User's password
 
-+ Response 200 (application/json)
++ Request (application/json)
 
         {
-            "key":"1e3576bt"
-            "permissions":["user","admin"]
+            "username":"VinaLx"
+            "password":"vpass"
         }
 
++ Response 201 (application/json)
 
-# Group Users
+    + Headers
 
-Resources related to users in the API.
+            Location: /user/{?username=username}
 
-## Users Collection [/users{?key}]
+    + Body
+
+            {
+                "token":"1a2b3c"
+            }
+
+### User Register [POST /register]
+
+To register a new account. It takes a JSON object containing a username, a password and a email address as its parament. The username should be unique.
+
++ username (string) - User's name
++ password (string) - User's password
++ email (string) - User's email address
+
++ Request (application/json)
+
+        {
+            "username":"VinaLx"
+            "password":"vpass"
+            "email":"VinaLx@mail2.sysu.edu.cn"
+        }
+
++ Response 201 (application/json)
+
+    + Headers
+
+            Location: /user/{?username=username}
+
+    + Body
+
+            {
+                "username":"VinaLx"
+                "password":"vpass"
+                "email":"VinaLx@mail2.sysu.edu.cn"
+            }
+
+
+## User Operations [/user{?token}]
 
 + Parameters
-    - key : `1e3576bt` (string, required)
+    - token : `1a2b3c` (string, required) - Auth Token
 
 ### List all Users [GET]
 
@@ -50,51 +86,26 @@ Resources related to users in the API.
 
         [
             {
-                "id":1
                 "username":"VinaLx"
                 "password":"vpass"
                 "email":"VinaLx@mail2.sysu.edu.cn"
             }, {
-                "id":2
                 "username":"ZexinYan"
                 "password":"zpass"
                 "email":"ZexinYan@mail2.sysu.edu.cn"
             }, {
-                "id":3
                 "username":"Jarvis"
                 "password":"jpass"
                 "email":"Jarvis@mail2.sysu.edu.cn"
             }
         ]
 
-### Create a New User [POST]
+### User Log Out [POST]
 
-+ Request (application/json)
+To log out. 
 
-        {
-            "username":"TestUser"
-            "password":"tpass"
-            "email":"TestUser@mail2.sysu.edu.cn"
-        }
++ Response 204
 
-+ Response 201 (application/json)
-
-    + Headers
-
-            Location: /users/4
-
-    + Body
-
-            {
-                "id": 4
-                "username":"TestUser"
-                "password":"tpass"
-                "email":"TestUser@mail2.sysu.edu.cn"
-            }
-
-### Delete a User [DELETE /users/{id}]
-
-+ Parameters
-    - id : `4` (int, required) - User ID
+### Delete a User [DELETE]
 
 + Response 204
