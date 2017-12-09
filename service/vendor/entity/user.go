@@ -7,10 +7,3 @@ type User struct {
 	Phone    string
 	Email    string
 }
-
-// UserDAO ..
-type UserDAO interface {
-	GetAllUsers() []*User
-	StoreUsers(user *User)
-	GetUser(username string) *User
-}
