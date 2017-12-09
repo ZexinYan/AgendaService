@@ -16,7 +16,7 @@ A User object has the following attributes:
 + email (string)
 
 
-## User Authorization [/]
+## Polls API Root [/]
 
 ### User Log In [POST /login]
 
@@ -36,7 +36,7 @@ To log in. It takes a JSON object containing the username and the  password of a
 
     + Headers
 
-            Location: /user/{?username=username}
+            Location: /welcome
 
     + Body
 
@@ -64,7 +64,7 @@ To register a new account. It takes a JSON object containing a username, a passw
 
     + Headers
 
-            Location: /user/{?username=username}
+            Location: /welcome
 
     + Body
 
@@ -75,12 +75,16 @@ To register a new account. It takes a JSON object containing a username, a passw
             }
 
 
-## User Operations [/user{?token}]
+## User Operations [/welcome{?token}]
+
+It contains the operations of a user when logged in. The token was generated after logged in.
 
 + Parameters
     - token : `1a2b3c` (string, required) - Auth Token
 
 ### List all Users [GET]
+
+To view all the users.
 
 + Response 200 (application/json)
 
@@ -102,10 +106,12 @@ To register a new account. It takes a JSON object containing a username, a passw
 
 ### User Log Out [POST]
 
-To log out. 
+To log out and the token will be removed.
 
 + Response 204
 
 ### Delete a User [DELETE]
+
+To delete the user account from database.
 
 + Response 204
