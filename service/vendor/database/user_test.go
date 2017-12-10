@@ -60,12 +60,6 @@ func TestGetAllUsers(t *testing.T) {
 				if noError(t, err) {
 					sort.Sort(entity.UserSlice(us))
 					sort.Sort(entity.UserSlice(now))
-					for _, u := range now {
-						log.Printf("%s %s %s\n", u.Username, u.Password, u.Email)
-					}
-					for _, u := range us {
-						log.Printf("%s %s %s\n", u.Username, u.Password, u.Email)
-					}
 					expectDeepEq(t, us, now)
 				}
 			}
@@ -74,51 +68,68 @@ func TestGetAllUsers(t *testing.T) {
 }
 
 func TestStoreUser(t *testing.T) {
-	type args struct {
-		user *entity.User
-	}
-	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
-	}{
-	// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if err := StoreUser(tt.args.user); (err != nil) != tt.wantErr {
-				t.Errorf("StoreUser() error = %v, wantErr %v", err, tt.wantErr)
+	withTestDB(func() {
+		t.Run("With Incremental Users", func(t *testing.T) {
+			log.Print("Testing with Incremental Users")
+			insert := []*entity.User{
+				{"foo", "fooooo", "foo@"}, {"bar", "barrrr", "bar@"},
+				{"baz", "bazzzz", "baz@"}}
+			now := make([]*entity.User, 0)
+			for _, u := range insert {
+				StoreUser(u)
+				now = append(now, u)
+				us, err := GetAllUsers()
+				if noError(t, err) {
+					sort.Sort(entity.UserSlice(us))
+					sort.Sort(entity.UserSlice(now))
+					expectDeepEq(t, us, now)
+				}
 			}
 		})
-	}
+	})
 }
 
 func TestRemoveUser(t *testing.T) {
-
+	withTestDB(func() {
+		t.Run("With decremental Users", func(t *testing.T) {
+			insert := []*entity.User{
+				{"foo", "fooooo", "foo@"}, {"bar", "barrrr", "bar@"},
+				{"baz", "bazzzz", "baz@"}}
+			now := make([]*entity.User, 0)
+			for _, u := range insert {
+				StoreUser(u)
+				now = append(now, u)
+			}
+			for _, u := range insert {
+				RemoveUser(u.Username)
+				now = now[1:]
+				us, _ := GetAllUsers()
+				sort.Sort(entity.UserSlice(us))
+				sort.Sort(entity.UserSlice(now))
+				expectDeepEq(t, us, now)
+			}
+		})
+	})
 }
 
 func TestGetUser(t *testing.T) {
-	type args struct {
-		username string
-	}
-	tests := []struct {
-		name    string
-		args    args
-		want    *entity.User
-		wantErr bool
-	}{
-	// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, err := GetUser(tt.args.username)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("GetUser() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("GetUser() = %v, want %v", got, tt.want)
+	withTestDB(func() {
+		t.Run("With decremental Users", func(t *testing.T) {
+			insert := []*entity.User{
+				{"foo", "fooooo", "foo@"}, {"bar", "barrrr", "bar@"},
+				{"baz", "bazzzz", "baz@"}}
+			for i, u := range insert {
+				StoreUser(u)
+				for j, u2 := range insert {
+					u3, _ := GetUser(u2.Username)
+					var n *entity.User
+					if j <= i {
+						expectDeepEq(t, u3, u2)
+					} else {
+						expectDeepEq(t, u3, n)
+					}
+				}
 			}
 		})
-	}
+	})
 }
