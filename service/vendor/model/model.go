@@ -74,6 +74,13 @@ func RemoveUser(username, token string) ErrorCode {
 
 // Login ..
 func Login(username, password string) (string, ErrorCode) {
+	u, err := database.GetUser(username)
+	if err != nil {
+		return "", DatabaseFail
+	}
+	if u == nil || u.Password != password {
+		return "", AuthenticationFail
+	}
 	t, err := database.GetToken(username)
 	if err == nil {
 		return "", DuplicateLogin

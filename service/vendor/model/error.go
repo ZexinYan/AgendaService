@@ -16,4 +16,6 @@ const (
 	DuplicateLogin
 	// WrongLoginState when login or logout is needed
 	WrongLoginState
+	// AuthenticationFail when username don't match password
+	AuthenticationFail
 )
