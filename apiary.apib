@@ -5,14 +5,6 @@ HOST: https://localhost:8080
 
 AgendaService is a simple API allowing users to manage their schedules online.
 
-# Group User
-
-A User object has the following attributes:
-
-+ username (string)
-+ password (string)
-+ email (string)
-
   
 # Group Access Authorization and Control
 
@@ -26,20 +18,41 @@ The Authorization Resource has the following attribute:
 
 + token
 
+Response Code and Message:
+Code | Message      | description
+---- | -------      | -----------
+200  | OK           | log in/out successfully
+401  | Unauthorized | log out fail
+403  | Forbidden    | log in fail
 
 ### Retrieve Authorization [GET]
 
-Get an Authentication token for operations later. It takes a JSON object containing a username and a password of as parament. If fails, the token should be empty.
+Get an Authentication token for operations later.
 
 + Parameters
     - username : `VinaLx` (string, required) - User Name
     - password : `vpass` (string, required) - User Password
 
 
+
 + Response 200 (application/json)
 
         {
-            "token":"1a2b3c"
+            "message":"OK"
+            "data":
+                    {
+                        "token":"1a2b3c"
+                    }
+        }
+        
++ Response 403 (application/json)
+
+        {
+            "message":"Forbidden"
+            "data":
+                    {
+                        "token":""
+                    }
         }
 
 
@@ -52,15 +65,97 @@ Remove an Authorization token from database.
 
 + Response 204
 
++ Response 401 (application/json)
 
-# Group Users
+        {
+            "message":"Unauthorized"
+            "data":
+                    {
+                        "token":""
+                    }
+        }
 
-Resources related to a users collection in the API.
+
+# Group User
+
+A User object has the following attributes:
+
++ username (string)
++ password (string)
++ email (string)
++ phone (string)
+
+
+## User [/v1/users/{username}]
+
+It contains the operations of a user object.
+
+Response Code and Reason:
+Code | Message   | description
+---- | -------   | -----------
+200  | OK        | retrive/delete successfully
+404  | Not Found | no such user
+
+### Retrive A User [GET]
+
+Return a specific user with username.
+
++ Response 200 (application/json)
+
+        {
+            "message":"OK"
+            "data":
+                    {
+                        "username":"VinaLx"
+                        "password":"vpass"
+                        "email":"VinaLx@mail2.sysu.edu.cn"
+                        "phone":"13766666666"
+                    }
+        }
+        
++ Response 404 (application/json)
+
+        {
+            "message":"Not Found"
+            "data":
+                    {
+                        "username":""
+                        "password":""
+                        "email":""
+                        "phone":""
+                    }
+        }
+
+### Delete A User [DELETE]
+
+To delete the user account with username from database.
+
++ Response 204
+
++ Response 404 (application/json)
+
+        {
+            "message":"Not Found"
+            "data":
+                    {
+                        "username":""
+                        "password":""
+                        "email":""
+                        "phone":""
+                    }
+        }
+
 
 ## Users Collection [/v1/users{?token}]
-  
-It contains the operations of users collection.
 
+It contains the operations of a users collection.
+
+Response Code and Reason:
+Code | Message      | description
+---- | -------      | -----------
+200  | OK           | create/list successfully
+401  | Unauthorized | have not log in
+409  | Conflict     | the username already exists
 
 ### Create A User [POST]
 
@@ -69,6 +164,7 @@ To create a new account. It takes a JSON object containing a username, a passwor
 + username (string) - User's name
 + password (string) - User's password
 + email (string) - User's email address
++ phone (string) - User's phone number
 
 + Request (application/json)
 
@@ -76,14 +172,33 @@ To create a new account. It takes a JSON object containing a username, a passwor
             "username":"VinaLx"
             "password":"vpass"
             "email":"VinaLx@mail2.sysu.edu.cn"
+            "phone":"13766666666"
         }
 
 + Response 201 (application/json)
 
         {
-            "username":"VinaLx"
-            "password":"vpass"
-            "email":"VinaLx@mail2.sysu.edu.cn"
+            "message":"Created"
+            "data":
+                    {
+                        "username":"VinaLx"
+                        "password":"vpass"
+                        "email":"VinaLx@mail2.sysu.edu.cn"
+                        "phone":"13766666666"
+                    }
+        }
+
++ Response 409 (application/json)
+
+        {
+            "message":"Conflict"
+            "data":
+                    {
+                        "username":""
+                        "password":""
+                        "email":""
+                        "phone":""
+                    }
         }
 
 ### List all Users [GET]
@@ -95,24 +210,32 @@ To view all the users.
 
 + Response 200 (application/json)
 
-        [
-            {
-                "username":"VinaLx"
-                "password":"vpass"
-                "email":"VinaLx@mail2.sysu.edu.cn"
-            }, {
-                "username":"ZexinYan"
-                "password":"zpass"
-                "email":"ZexinYan@mail2.sysu.edu.cn"
-            }, {
-                "username":"Jarvis"
-                "password":"jpass"
-                "email":"Jarvis@mail2.sysu.edu.cn"
-            }
-        ]
-   
-### Delete a User [DELETE /v1/users/{username}]
+        {
+            "message":"Created"
+            "data":
+                    [
+                        {
+                            "username":"VinaLx"
+                            "password":"vpass"
+                            "email":"VinaLx@mail2.sysu.edu.cn"
+                            "phone":"13766666666"
+                        }, {
+                            "username":"ZexinYan"
+                            "password":"zpass"
+                            "email":"ZexinYan@mail2.sysu.edu.cn"
+                            "phone":"13866666666"
+                        }, {
+                            "username":"Jarvis"
+                            "password":"jpass"
+                            "email":"Jarvis@mail2.sysu.edu.cn"
+                            "phone":"13966666666"
+                        }
+                    ]
+        }
+        
++ Response 401 (application/json)
 
-To delete the user account with username from database.
-
-+ Response 204
+        {
+            "message":"Unauthorized"
+            "data":[]
+        }
