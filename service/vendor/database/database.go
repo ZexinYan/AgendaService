@@ -3,12 +3,13 @@ package database
 import (
 	"database/sql"
 	"log"
+	"os"
 )
 
 const createUserTableSQL = `CREATE TABLE IF NOT EXISTS User (
 	username TEXT PRIMARY KEY,
 	password TEXT NOT NULL,
-	email TEXT NOT NULL,
+	email TEXT NOT NULL
 );`
 
 const createLoginTableSQL = `CREATE TABLE IF NOT EXISTS Login (
@@ -18,7 +19,31 @@ const createLoginTableSQL = `CREATE TABLE IF NOT EXISTS Login (
 	CONSTRAINT uu UNIQUE (username)
 );`
 
-var theDB *sql.DB
+type sqlWork func(db *sql.DB)
+
+type agendaDB struct {
+	db    *sql.DB
+	file  string
+	queue chan sqlWork
+}
+
+var adb *agendaDB
+
+// CloseDB do not support concurrent access
+func CloseDB() error {
+	if adb == nil {
+		return nil
+	}
+	var err error
+	if adb.db != nil {
+		err = adb.db.Close()
+	}
+	if adb.db != nil {
+		close(adb.queue)
+	}
+	adb = nil
+	return err
+}
 
 func prepareDB(dbfile string) (*sql.DB, error) {
 	db, err := sql.Open("sqlite3", dbfile)
@@ -34,49 +59,77 @@ func prepareDB(dbfile string) (*sql.DB, error) {
 	_, err = db.Exec(createLoginTableSQL)
 	if err != nil {
 		log.Fatal(err.Error())
+		return nil, err
 	}
 	log.Print("database initialized")
 	return db, nil
 }
 
+func startExecQueue(db *sql.DB) chan sqlWork {
+	q := make(chan sqlWork)
+	go func() {
+		for f := range q {
+			f(db)
+		}
+	}()
+	return q
+}
+
 // InitializeDB with specific file
 func InitializeDB(dbfile string) error {
-	if theDB != nil {
-		theDB.Close()
-	}
+	CloseDB()
 	db, err := prepareDB(dbfile)
 	if err != nil {
 		return err
 	}
-	theDB = db
+	adb = &agendaDB{
+		db:    db,
+		file:  dbfile,
+		queue: startExecQueue(db),
+	}
 	return nil
 }
 
-func pQuery(db *sql.DB, s string, args ...interface{}) (chan *sql.Rows, error) {
-	stmt, err := db.Prepare(s)
-	if err != nil {
-		return nil, err
+// ClearDB and the file
+func ClearDB() error {
+	if adb == nil {
+		return nil
 	}
-	rows, err := stmt.Query(args...)
-	if err != nil {
-		return nil, err
-	}
-	chanRow := make(chan *sql.Rows)
-	go func() {
-		for rows.Next() {
-			chanRow <- rows
-		}
-		stmt.Close()
-	}()
-	return chanRow, nil
-
+	os.Remove(adb.file)
+	return CloseDB()
 }
-func pExec(db *sql.DB, sql string, args ...interface{}) (sql.Result, error) {
-	stmt, err := db.Prepare(sql)
-	if err != nil {
-		return nil, err
+
+func pQuery(rf func(*sql.Rows), ef func(error), s string, args ...interface{}) chan struct{} {
+	done := make(chan struct{})
+	adb.queue <- func(db *sql.DB) {
+		defer func() { done <- struct{}{} }()
+		row, err := db.Query(s, args...)
+		if err != nil {
+			ef(err)
+			return
+		}
+		for row.Next() {
+			if row.Err() != nil {
+				ef(row.Err())
+				return
+			}
+			rf(row)
+		}
+		row.Close()
 	}
-	result, err := stmt.Exec(args...)
-	stmt.Close()
-	return result, err
+	return done
+}
+
+func pExec(s string, args ...interface{}) (sql.Result, error) {
+	var result sql.Result
+	var e error
+	done := make(chan struct{})
+	adb.queue <- func(db *sql.DB) {
+		res, err := db.Exec(s, args...)
+		result = res
+		e = err
+		done <- struct{}{}
+	}
+	<-done
+	return result, e
 }
