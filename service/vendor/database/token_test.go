@@ -2,6 +2,7 @@ package database
 
 import (
 	"testing"
+	"testutil"
 )
 
 type ut struct {
@@ -10,7 +11,7 @@ type ut struct {
 }
 
 func TestGetToken(t *testing.T) {
-	withTestDB(func() {
+	WithTestDB(func() {
 		uts := []ut{{"foo", "fooooo"}, {"bar", "barrrrrr"}, {"baz", "bazzzzzz"}}
 		t.Run("With Empty Database", func(t *testing.T) {
 			for _, uT := range uts {
@@ -24,9 +25,9 @@ func TestGetToken(t *testing.T) {
 		t.Run("With Adding Tokens Incrementally", func(t *testing.T) {
 			for _, uT := range uts {
 				e := PutToken(uT.user, uT.token)
-				if noError(t, e) {
+				if testutil.NoError(t, e) {
 					tok, e := GetToken(uT.user)
-					if noError(t, e) {
+					if testutil.NoError(t, e) {
 						expectDeepEq(t, tok, uT.token)
 					}
 				}
@@ -36,13 +37,13 @@ func TestGetToken(t *testing.T) {
 }
 
 func TestPutToken(t *testing.T) {
-	withTestDB(func() {
+	WithTestDB(func() {
 		uts := []ut{{"foo", "fooooo"}, {"bar", "barrrrrr"}, {"baz", "bazzzzzz"}}
 		for _, uT := range uts {
 			e := PutToken(uT.user, uT.token)
-			if noError(t, e) {
+			if testutil.NoError(t, e) {
 				tok, e := GetToken(uT.user)
-				if noError(t, e) {
+				if testutil.NoError(t, e) {
 					expectDeepEq(t, tok, uT.token)
 				}
 			}
@@ -51,12 +52,12 @@ func TestPutToken(t *testing.T) {
 }
 
 func TestDeleteToken(t *testing.T) {
-	withTestDB(func() {
+	WithTestDB(func() {
 		uts := []ut{{"foo", "fooooo"}, {"bar", "barrrrrr"}, {"baz", "bazzzzzz"}}
 		t.Run("With Empty Database", func(t *testing.T) {
 			for _, uT := range uts {
 				err := DeleteToken(uT.token)
-				noError(t, err)
+				testutil.NoError(t, err)
 			}
 		})
 		t.Run("Adding data then delete", func(t *testing.T) {
@@ -77,12 +78,12 @@ func TestDeleteToken(t *testing.T) {
 }
 
 func TestDeleteTokenByUsername(t *testing.T) {
-	withTestDB(func() {
+	WithTestDB(func() {
 		uts := []ut{{"foo", "fooooo"}, {"bar", "barrrrrr"}, {"baz", "bazzzzzz"}}
 		t.Run("With Empty Database", func(t *testing.T) {
 			for _, uT := range uts {
 				err := DeleteTokenByUsername(uT.user)
-				noError(t, err)
+				testutil.NoError(t, err)
 			}
 		})
 		t.Run("Adding data then delete", func(t *testing.T) {

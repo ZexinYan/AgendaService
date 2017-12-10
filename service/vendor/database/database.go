@@ -29,6 +29,20 @@ type agendaDB struct {
 
 var adb *agendaDB
 
+// WithDB ..
+func WithDB(file string, f func()) {
+	InitializeDB(file)
+	log.Print("database set up")
+	f()
+	ClearDB()
+	log.Print("database tear down")
+}
+
+// WithTestDB ..
+func WithTestDB(f func()) {
+	WithDB("Test.db", f)
+}
+
 // CloseDB do not support concurrent access
 func CloseDB() error {
 	if adb == nil {

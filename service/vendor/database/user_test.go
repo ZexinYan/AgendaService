@@ -3,48 +3,20 @@ package database
 import (
 	"entity"
 	"log"
-	"reflect"
 	"sort"
 	"testing"
+	"testutil"
 
 	_ "github.com/mattn/go-sqlite3"
 )
 
-func withDB(file string, f func()) {
-	InitializeDB(file)
-	log.Print("database set up")
-	f()
-	ClearDB()
-	log.Print("database tear down")
-}
-
-func withTestDB(f func()) {
-	withDB("Test.db", f)
-}
-
-func noError(t *testing.T, err error) bool {
-	if err != nil {
-		t.Errorf("Unexpected error: %s\n", err.Error())
-		return false
-	}
-	return true
-}
-
-func expectDeepEq(t *testing.T, a, b interface{}) {
-	if !reflect.DeepEqual(a, b) {
-		t.Errorf("Fail: Expected: %v, Actual: %v\n", b, a)
-	} else {
-		t.Log("Pass")
-	}
-}
-
 func TestGetAllUsers(t *testing.T) {
-	withTestDB(func() {
+	WithTestDB(func() {
 		t.Run("Empty Database", func(t *testing.T) {
 			log.Print("Testing with Empty Databaes")
 			us, err := GetAllUsers()
-			if noError(t, err) {
-				expectDeepEq(t, us, make([]*entity.User, 0))
+			if testutil.NoError(t, err) {
+				testutil.ExpectDeepEq(t, us, make([]*entity.User, 0))
 			}
 		})
 		t.Run("With Incremental Users", func(t *testing.T) {
@@ -57,10 +29,10 @@ func TestGetAllUsers(t *testing.T) {
 				StoreUser(u)
 				now = append(now, u)
 				us, err := GetAllUsers()
-				if noError(t, err) {
+				if testutil.NoError(t, err) {
 					sort.Sort(entity.UserSlice(us))
 					sort.Sort(entity.UserSlice(now))
-					expectDeepEq(t, us, now)
+					testutil.ExpectDeepEq(t, us, now)
 				}
 			}
 		})
@@ -68,7 +40,7 @@ func TestGetAllUsers(t *testing.T) {
 }
 
 func TestStoreUser(t *testing.T) {
-	withTestDB(func() {
+	WithTestDB(func() {
 		t.Run("With Incremental Users", func(t *testing.T) {
 			log.Print("Testing with Incremental Users")
 			insert := []*entity.User{
@@ -79,10 +51,10 @@ func TestStoreUser(t *testing.T) {
 				StoreUser(u)
 				now = append(now, u)
 				us, err := GetAllUsers()
-				if noError(t, err) {
+				if testutil.NoError(t, err) {
 					sort.Sort(entity.UserSlice(us))
 					sort.Sort(entity.UserSlice(now))
-					expectDeepEq(t, us, now)
+					testutil.ExpectDeepEq(t, us, now)
 				}
 			}
 		})
@@ -90,7 +62,7 @@ func TestStoreUser(t *testing.T) {
 }
 
 func TestRemoveUser(t *testing.T) {
-	withTestDB(func() {
+	WithTestDB(func() {
 		t.Run("With decremental Users", func(t *testing.T) {
 			insert := []*entity.User{
 				{"foo", "fooooo", "foo@"}, {"bar", "barrrr", "bar@"},
@@ -106,14 +78,14 @@ func TestRemoveUser(t *testing.T) {
 				us, _ := GetAllUsers()
 				sort.Sort(entity.UserSlice(us))
 				sort.Sort(entity.UserSlice(now))
-				expectDeepEq(t, us, now)
+				testutil.ExpectDeepEq(t, us, now)
 			}
 		})
 	})
 }
 
 func TestGetUser(t *testing.T) {
-	withTestDB(func() {
+	WithTestDB(func() {
 		t.Run("With decremental Users", func(t *testing.T) {
 			insert := []*entity.User{
 				{"foo", "fooooo", "foo@"}, {"bar", "barrrr", "bar@"},
@@ -124,9 +96,9 @@ func TestGetUser(t *testing.T) {
 					u3, _ := GetUser(u2.Username)
 					var n *entity.User
 					if j <= i {
-						expectDeepEq(t, u3, u2)
+						testutil.ExpectDeepEq(t, u3, u2)
 					} else {
-						expectDeepEq(t, u3, n)
+						testutil.ExpectDeepEq(t, u3, n)
 					}
 				}
 			}
