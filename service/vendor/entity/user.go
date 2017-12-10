@@ -4,6 +4,5 @@ package entity
 type User struct {
 	Username string
 	Password string
-	Phone    string
 	Email    string
 }

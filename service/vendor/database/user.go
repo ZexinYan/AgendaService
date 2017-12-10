@@ -11,7 +11,7 @@ func GetAllUsers() ([]*entity.User, error) {
 	result := make([]*entity.User, 0)
 	for row := range rows {
 		var u entity.User
-		row.Scan(&u.Username, &u.Password, &u.Phone, &u.Email)
+		row.Scan(&u.Username, &u.Password, &u.Email)
 		result = append(result, &u)
 	}
 	return result, nil
@@ -22,7 +22,7 @@ func StoreUser(user *entity.User) error {
 	_, err := pExec(
 		theDB,
 		"INSERT INTO User (username, password, phone, email) VALUES (?, ?, ?, ?)",
-		user.Username, user.Password, user.Phone, user.Email)
+		user.Username, user.Password, user.Email)
 	return err
 }
 
@@ -34,7 +34,7 @@ func GetUser(username string) (*entity.User, error) {
 	}
 	for row := range rows {
 		var u entity.User
-		row.Scan(&u.Username, &u.Password, &u.Phone, &u.Email)
+		row.Scan(&u.Username, &u.Password, &u.Email)
 		return &u, nil
 	}
 	return nil, nil

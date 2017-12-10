@@ -6,12 +6,9 @@ import (
 )
 
 const createUserTableSQL = `CREATE TABLE IF NOT EXISTS User (
-	uid INTEGER PRIMARY KEY AUTOINCREMENT,
-	username TEXT NOT NULL,
+	username TEXT PRIMARY KEY,
 	password TEXT NOT NULL,
-	phone TEXT NOT NULL,
 	email TEXT NOT NULL,
-	CONSTRAINT uu UNIQUE (username)
 );`
 
 const createLoginTableSQL = `CREATE TABLE IF NOT EXISTS Login (
