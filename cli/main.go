@@ -16,8 +16,10 @@ package main
 
 import (
 	"cli"
+	"model"
 )
 
 func main() {
+	model.EnsureAgendaDir()
 	cli.Execute()
 }
