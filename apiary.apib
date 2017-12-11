@@ -1,10 +1,51 @@
 FORMAT: 1A
-HOST: (https://localhost:8080) with ngrok
+HOST: https://localhost:8080
 
 # AgendaService
 
 AgendaService is a simple API allowing users to manage their schedules online.
 
+Common Response Code and Message:
+Code | Message               | description
+---- | -------               | -----------
+200  | OK                    | the request has succeeded
+400  | {parameter1, ...}     | missing parameters
+500  | Internal Server Error | Internal server error occurs
+501  | Not Implement         | server does not support the functionality
+
+Some common responses:
+
++ Response 200 (application/json)
+
+        {
+            "message":"OK"
+            "data":
+                    ...
+        }
+
++ Response 400 (application/json)
+
+        {
+            "message":"{parameter1, ...}"
+            "data":
+                    ...
+        }
+        
++ Response 500 (application/json)
+
+        {
+            "message":"Internal Server Error"
+            "data":
+                    ...
+        }
+
++ Response 501 (application/json)
+
+        {
+            "message":"Not Implement"
+            "data":
+                    ...
+        }
   
 # Group Access Authorization and Control
 
@@ -22,6 +63,7 @@ Response Code and Message:
 Code | Message      | description
 ---- | -------      | -----------
 200  | OK           | log in/out successfully
+204  | No Content   | delete successfully
 401  | Unauthorized | log out fail
 403  | Forbidden    | log in fail
 
@@ -32,8 +74,6 @@ Get an Authentication token for operations later.
 + Parameters
     - username : `VinaLx` (string, required) - User Name
     - password : `vpass` (string, required) - User Password
-
-
 
 + Response 200 (application/json)
 
@@ -86,15 +126,19 @@ A User object has the following attributes:
 + phone (string)
 
 
-## User [/v1/users/{username}]
+## User [/v1/users/{username}{?token}]
 
 It contains the operations of a user object.
 
 Response Code and Reason:
-Code | Message   | description
----- | -------   | -----------
-200  | OK        | retrive/delete successfully
-404  | Not Found | no such user
+Code | Message    | description
+---- | -------    | -----------
+200  | OK         | retrive successfully
+204  | No Content | delete successfully
+404  | Not Found  | no such user
+
++ Parameters
+    - token : `1a2b3c` (string, required) - Auth Token
 
 ### Retrive A User [GET]
 
@@ -150,7 +194,8 @@ It contains the operations of a users collection.
 Response Code and Reason:
 Code | Message      | description
 ---- | -------      | -----------
-200  | OK           | create/list successfully
+200  | OK           | list successfully
+201  | Created      | create successfully
 401  | Unauthorized | have not log in
 409  | Conflict     | the username already exists
 
@@ -206,7 +251,7 @@ To view all the users.
 + Response 200 (application/json)
 
         {
-            "message":"Created"
+            "message":"OK"
             "data":
                     [
                         {
