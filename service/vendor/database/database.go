@@ -9,7 +9,8 @@ import (
 const createUserTableSQL = `CREATE TABLE IF NOT EXISTS User (
 	username TEXT PRIMARY KEY,
 	password TEXT NOT NULL,
-	email TEXT NOT NULL
+	email TEXT NOT NULL,
+	phone TEXT NOT NULL
 );`
 
 const createLoginTableSQL = `CREATE TABLE IF NOT EXISTS Login (

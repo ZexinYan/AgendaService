@@ -12,7 +12,7 @@ func GetAllUsers() ([]*entity.User, error) {
 	var err error
 	<-pQuery(func(r *sql.Rows) {
 		var u entity.User
-		r.Scan(&u.Username, &u.Password, &u.Email)
+		r.Scan(&u.Username, &u.Password, &u.Email, &u.Phone)
 		result = append(result, &u)
 	}, func(e error) {
 		err = e
@@ -26,10 +26,10 @@ func GetAllUsers() ([]*entity.User, error) {
 // StoreUser ..
 func StoreUser(user *entity.User) error {
 	log.Printf(
-		"Creating User (%s, %s, %s)", user.Username, user.Password, user.Email)
+		"Creating User (%s, %s, %s, %s)", user.Username, user.Password, user.Email, user.Phone)
 	result, err := pExec(
-		"INSERT INTO User (username, password, email) VALUES (?, ?, ?)",
-		user.Username, user.Password, user.Email)
+		"INSERT INTO User (username, password, email, phone) VALUES (?, ?, ?, ?)",
+		user.Username, user.Password, user.Email, user.Phone)
 	if err != nil {
 		log.Printf("Error: %s", err.Error())
 	} else {
@@ -49,7 +49,7 @@ func GetUser(username string) (*entity.User, error) {
 	var err error
 	<-pQuery(func(r *sql.Rows) {
 		var u entity.User
-		r.Scan(&u.Username, &u.Password, &u.Email)
+		r.Scan(&u.Username, &u.Password, &u.Email, &u.Phone)
 		user = &u
 	}, func(e error) {
 		err = e

@@ -22,8 +22,8 @@ func ok(t *testing.T, ec ErrorCode) bool {
 func TestCreateUser(t *testing.T) {
 	database.WithTestDB(func() {
 		users := []*entity.User{
-			{"foo", "fooooo", "foo@"}, {"bar", "barrrr", "bar@"},
-			{"baz", "bazzzz", "baz@"}}
+			{"foo", "fooooo", "foo@", "11"}, {"bar", "barrrr", "bar@", "22"},
+			{"baz", "bazzzz", "baz@", "33"}}
 		now := make([]*entity.User, 0)
 		for _, u := range users {
 			now = append(now, u)
@@ -47,8 +47,8 @@ func TestCreateUser(t *testing.T) {
 func TestGetAllUsers(t *testing.T) {
 	database.WithTestDB(func() {
 		users := []*entity.User{
-			{"foo", "fooooo", "foo@"}, {"bar", "barrrr", "bar@"},
-			{"baz", "bazzzz", "baz@"}}
+			{"foo", "fooooo", "foo@", "11"}, {"bar", "barrrr", "bar@", "22"},
+			{"baz", "bazzzz", "baz@", "33"}}
 		sort.Sort(entity.UserSlice(users))
 		for _, u := range users {
 			database.StoreUser(u)
@@ -73,14 +73,14 @@ func TestGetAllUsers(t *testing.T) {
 func TestRemoveUser(t *testing.T) {
 	database.WithTestDB(func() {
 		users := []*entity.User{
-			{"foo", "fooooo", "foo@"}, {"bar", "barrrr", "bar@"},
-			{"baz", "bazzzz", "baz@"}}
+			{"foo", "fooooo", "foo@", "11"}, {"bar", "barrrr", "bar@", "22"},
+			{"baz", "bazzzz", "baz@", "33"}}
 		sort.Sort(entity.UserSlice(users))
 		for _, u := range users {
 			database.StoreUser(u)
 		}
 		t.Run("Without Authentication", func(t *testing.T) {
-			ec := RemoveUser("foo", "noSuchToken")
+			ec := RemoveUser("noSuchToken")
 			testutil.ExpectDeepEq(t, ec, InvalidToken)
 			us, _ := database.GetAllUsers()
 			sort.Sort(entity.UserSlice(us))
@@ -88,13 +88,14 @@ func TestRemoveUser(t *testing.T) {
 		})
 		t.Run("With Authentication", func(t *testing.T) {
 			database.PutToken("foo", "nowwehavetoken")
-			ec := RemoveUser("foo", "notthistoken")
+			ec := RemoveUser("notthistoken")
 			testutil.ExpectDeepEq(t, ec, InvalidToken)
-			ec = RemoveUser("foo", "nowwehavetoken")
+			ec = RemoveUser("nowwehavetoken")
 			if ok(t, ec) {
 				sort.Sort(entity.UserSlice(users))
 				userleft := []*entity.User{
-					{"bar", "barrrr", "bar@"}, {"baz", "bazzzz", "baz@"}}
+					{"bar", "barrrr", "bar@", "22"},
+					{"baz", "bazzzz", "baz@", "33"}}
 				us, _ := database.GetAllUsers()
 				sort.Sort(entity.UserSlice(us))
 				testutil.ExpectDeepEq(t, us, userleft)
@@ -106,8 +107,8 @@ func TestRemoveUser(t *testing.T) {
 func TestLogin(t *testing.T) {
 	database.WithTestDB(func() {
 		users := []*entity.User{
-			{"foo", "fooooo", "foo@"}, {"bar", "barrrr", "bar@"},
-			{"baz", "bazzzz", "baz@"}}
+			{"foo", "fooooo", "foo@", "11"}, {"bar", "barrrr", "bar@", "22"},
+			{"baz", "bazzzz", "baz@", "33"}}
 		for _, u := range users {
 			database.StoreUser(u)
 		}
@@ -137,8 +138,8 @@ func TestLogin(t *testing.T) {
 func TestLogout(t *testing.T) {
 	database.WithTestDB(func() {
 		users := []*entity.User{
-			{"foo", "fooooo", "foo@"}, {"bar", "barrrr", "bar@"},
-			{"baz", "bazzzz", "baz@"}}
+			{"foo", "fooooo", "foo@", "11"}, {"bar", "barrrr", "bar@", "22"},
+			{"baz", "bazzzz", "baz@", "33"}}
 		for _, u := range users {
 			database.StoreUser(u)
 		}

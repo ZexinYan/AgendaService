@@ -16,7 +16,7 @@ func TestGetToken(t *testing.T) {
 		t.Run("With Empty Database", func(t *testing.T) {
 			for _, uT := range uts {
 				tok, e := GetToken(uT.user)
-				expectDeepEq(t, tok, "")
+				testutil.ExpectDeepEq(t, tok, "")
 				if e == nil {
 					t.Errorf("should get error when querying empty db")
 				}
@@ -28,7 +28,7 @@ func TestGetToken(t *testing.T) {
 				if testutil.NoError(t, e) {
 					tok, e := GetToken(uT.user)
 					if testutil.NoError(t, e) {
-						expectDeepEq(t, tok, uT.token)
+						testutil.ExpectDeepEq(t, tok, uT.token)
 					}
 				}
 			}
@@ -44,7 +44,7 @@ func TestPutToken(t *testing.T) {
 			if testutil.NoError(t, e) {
 				tok, e := GetToken(uT.user)
 				if testutil.NoError(t, e) {
-					expectDeepEq(t, tok, uT.token)
+					testutil.ExpectDeepEq(t, tok, uT.token)
 				}
 			}
 		}
@@ -97,6 +97,56 @@ func TestDeleteTokenByUsername(t *testing.T) {
 					t.Errorf(
 						"token %s should be deleted, but still has user %s",
 						uT.token, uT.user)
+				}
+			}
+		})
+	})
+}
+
+func TestHasToken(t *testing.T) {
+	WithTestDB(func() {
+		uts := []ut{{"foo", "fooooo"}, {"bar", "barrrrrr"}, {"baz", "bazzzzzz"}}
+		t.Run("With Empty Database", func(t *testing.T) {
+			for _, uT := range uts {
+				b, e := HasToken(uT.token)
+				if testutil.NoError(t, e) {
+					testutil.ExpectDeepEq(t, b, false)
+				}
+			}
+		})
+		t.Run("With Adding Tokens Incrementally", func(t *testing.T) {
+			for _, uT := range uts {
+				e := PutToken(uT.user, uT.token)
+				if testutil.NoError(t, e) {
+					b, e := HasToken(uT.token)
+					if testutil.NoError(t, e) {
+						testutil.ExpectDeepEq(t, b, true)
+					}
+				}
+			}
+		})
+	})
+}
+
+func TestGetUsername(t *testing.T) {
+	WithTestDB(func() {
+		uts := []ut{{"foo", "fooooo"}, {"bar", "barrrrrr"}, {"baz", "bazzzzzz"}}
+		t.Run("With Empty Database", func(t *testing.T) {
+			for _, uT := range uts {
+				u, e := GetUsername(uT.token)
+				if testutil.NoError(t, e) {
+					testutil.ExpectDeepEq(t, u, "")
+				}
+			}
+		})
+		t.Run("With Adding Tokens Incrementally", func(t *testing.T) {
+			for _, uT := range uts {
+				e := PutToken(uT.user, uT.token)
+				if testutil.NoError(t, e) {
+					u, e := GetUsername(uT.token)
+					if testutil.NoError(t, e) {
+						testutil.ExpectDeepEq(t, u, uT.user)
+					}
 				}
 			}
 		})

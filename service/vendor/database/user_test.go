@@ -22,8 +22,8 @@ func TestGetAllUsers(t *testing.T) {
 		t.Run("With Incremental Users", func(t *testing.T) {
 			log.Print("Testing with Incremental Users")
 			insert := []*entity.User{
-				{"foo", "fooooo", "foo@"}, {"bar", "barrrr", "bar@"},
-				{"baz", "bazzzz", "baz@"}}
+				{"foo", "fooooo", "foo@", "11"}, {"bar", "barrrr", "bar@", "2"},
+				{"baz", "bazzzz", "baz@", "33"}}
 			now := make([]*entity.User, 0)
 			for _, u := range insert {
 				StoreUser(u)
@@ -44,8 +44,8 @@ func TestStoreUser(t *testing.T) {
 		t.Run("With Incremental Users", func(t *testing.T) {
 			log.Print("Testing with Incremental Users")
 			insert := []*entity.User{
-				{"foo", "fooooo", "foo@"}, {"bar", "barrrr", "bar@"},
-				{"baz", "bazzzz", "baz@"}}
+				{"foo", "fooooo", "foo@", "11"}, {"bar", "barrrr", "bar@", "2"},
+				{"baz", "bazzzz", "baz@", "33"}}
 			now := make([]*entity.User, 0)
 			for _, u := range insert {
 				StoreUser(u)
@@ -65,8 +65,8 @@ func TestRemoveUser(t *testing.T) {
 	WithTestDB(func() {
 		t.Run("With decremental Users", func(t *testing.T) {
 			insert := []*entity.User{
-				{"foo", "fooooo", "foo@"}, {"bar", "barrrr", "bar@"},
-				{"baz", "bazzzz", "baz@"}}
+				{"foo", "fooooo", "foo@", "11"}, {"bar", "barrrr", "bar@", "2"},
+				{"baz", "bazzzz", "baz@", "33"}}
 			now := make([]*entity.User, 0)
 			for _, u := range insert {
 				StoreUser(u)
@@ -88,8 +88,8 @@ func TestGetUser(t *testing.T) {
 	WithTestDB(func() {
 		t.Run("With decremental Users", func(t *testing.T) {
 			insert := []*entity.User{
-				{"foo", "fooooo", "foo@"}, {"bar", "barrrr", "bar@"},
-				{"baz", "bazzzz", "baz@"}}
+				{"foo", "fooooo", "foo@", "11"}, {"bar", "barrrr", "bar@", "2"},
+				{"baz", "bazzzz", "baz@", "33"}}
 			for i, u := range insert {
 				StoreUser(u)
 				for j, u2 := range insert {

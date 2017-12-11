@@ -8,16 +8,16 @@ import (
 )
 
 type needLogin struct {
-	username string
+	token string
 }
 
-func authenticate(username string, token string) (*needLogin, ErrorCode) {
-	tok, err := database.GetToken(username)
+func authenticate(token string) (*needLogin, ErrorCode) {
+	b, err := database.HasToken(token)
 	if err != nil {
-		return nil, InvalidToken
+		return nil, DatabaseFail
 	}
-	if tok == token {
-		return &needLogin{username}, OK
+	if b {
+		return &needLogin{token}, OK
 	}
 	return nil, InvalidToken
 }
@@ -46,26 +46,30 @@ func getAllUsers(needLogin) ([]*entity.User, ErrorCode) {
 	return us, OK
 }
 
-func removeUser(l needLogin) ErrorCode {
-	err := database.RemoveUser(l.username)
-	if err != nil {
-		return DatabaseFail
-	}
-	return OK
-}
-
 // GetAllUsers ..
 func GetAllUsers(username, token string) ([]*entity.User, ErrorCode) {
-	lp, ec := authenticate(username, token)
+	lp, ec := authenticate(token)
 	if ec != OK {
 		return nil, ec
 	}
 	return getAllUsers(*lp)
 }
 
+func removeUser(l needLogin) ErrorCode {
+	u, err := database.GetUsername(l.token)
+	if err != nil {
+		return DatabaseFail
+	}
+	err = database.RemoveUser(u)
+	if err != nil {
+		return DatabaseFail
+	}
+	return OK
+}
+
 // RemoveUser ..
-func RemoveUser(username, token string) ErrorCode {
-	lp, ec := authenticate(username, token)
+func RemoveUser(token string) ErrorCode {
+	lp, ec := authenticate(token)
 	if ec != OK {
 		return ec
 	}
@@ -95,7 +99,7 @@ func Login(username, password string) (string, ErrorCode) {
 
 // Logout ..
 func Logout(username, token string) ErrorCode {
-	lp, ec := authenticate(username, token)
+	lp, ec := authenticate(token)
 	if ec != OK {
 		return ec
 	}
@@ -103,7 +107,7 @@ func Logout(username, token string) ErrorCode {
 }
 
 func logout(l needLogin) ErrorCode {
-	err := database.DeleteTokenByUsername(l.username)
+	err := database.DeleteToken(l.token)
 	if err != nil {
 		return DatabaseFail
 	}

@@ -23,6 +23,36 @@ func GetToken(username string) (string, error) {
 	return token, err
 }
 
+// HasToken ..
+func HasToken(token string) (bool, error) {
+	var result bool
+	var err error
+	<-pQuery(func(r *sql.Rows) {
+		result = true
+	}, func(e error) {
+		err = e
+	}, "SELECT token FROM Login WHERE token = ?", token)
+	if err != nil {
+		return false, err
+	}
+	return result, err
+}
+
+// GetUsername ..
+func GetUsername(token string) (string, error) {
+	var username string
+	var err error
+	<-pQuery(func(r *sql.Rows) {
+		r.Scan(&username)
+	}, func(e error) {
+		err = e
+	}, "SELECT username FROM Login WHERE token = ?", token)
+	if err != nil {
+		return "", err
+	}
+	return username, nil
+}
+
 // PutToken ..
 func PutToken(username string, token string) error {
 	_, err := pExec(
