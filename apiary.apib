@@ -122,11 +122,12 @@ A User object has the following attributes:
 It contains the operations of a user object.
 
 Response Code and Reason:
-Code | Message    | description
----- | -------    | -----------
-200  | OK         | retrive successfully
-204  | No Content | delete successfully
-404  | Not Found  | no such user
+Code | Message      | description
+---- | -------      | -----------
+200  | OK           | retrive successfully
+204  | No Content   | delete successfully
+401  | Unauthorized | authorization fail
+404  | Not Found    | no such user
 
 + Parameters
     - token : `1a2b3c` (string, required) - Auth Token
@@ -146,7 +147,14 @@ Return a specific user with username.
                         "phone":"13766666666"
                     }
         }
-        
+
++ Response 401 (application/json)
+
+        {
+            "message":"Unauthorized",
+            "data": null
+        }
+
 + Response 404 (application/json)
 
         {
