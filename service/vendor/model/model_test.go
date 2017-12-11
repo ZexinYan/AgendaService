@@ -55,13 +55,13 @@ func TestGetAllUsers(t *testing.T) {
 		}
 		var nilus []*entity.User
 		t.Run("Without Authentication", func(t *testing.T) {
-			us, ec := GetAllUsers("foo", "noSuchToken")
+			us, ec := GetAllUsers("noSuchToken")
 			testutil.ExpectDeepEq(t, us, nilus)
 			testutil.ExpectDeepEq(t, ec, InvalidToken)
 		})
 		t.Run("With Authentication", func(t *testing.T) {
 			database.PutToken("foo", "nowwehavetoken")
-			us, ec := GetAllUsers("foo", "nowwehavetoken")
+			us, ec := GetAllUsers("nowwehavetoken")
 			if ok(t, ec) {
 				sort.Sort(entity.UserSlice(users))
 				testutil.ExpectDeepEq(t, us, users)
@@ -80,7 +80,7 @@ func TestRemoveUser(t *testing.T) {
 			database.StoreUser(u)
 		}
 		t.Run("Without Authentication", func(t *testing.T) {
-			ec := RemoveUser("noSuchToken")
+			ec := RemoveUser("noSuchUser", "noSuchToken")
 			testutil.ExpectDeepEq(t, ec, InvalidToken)
 			us, _ := database.GetAllUsers()
 			sort.Sort(entity.UserSlice(us))
@@ -88,9 +88,12 @@ func TestRemoveUser(t *testing.T) {
 		})
 		t.Run("With Authentication", func(t *testing.T) {
 			database.PutToken("foo", "nowwehavetoken")
-			ec := RemoveUser("notthistoken")
+			database.PutToken("bar", "barstoken")
+			ec := RemoveUser("foo", "notthistoken")
 			testutil.ExpectDeepEq(t, ec, InvalidToken)
-			ec = RemoveUser("nowwehavetoken")
+			ec = RemoveUser("baz", "barstoken")
+			testutil.ExpectDeepEq(t, ec, InvalidToken)
+			ec = RemoveUser("foo", "nowwehavetoken")
 			if ok(t, ec) {
 				sort.Sort(entity.UserSlice(users))
 				userleft := []*entity.User{
@@ -127,11 +130,6 @@ func TestLogin(t *testing.T) {
 				testutil.ExpectDeepEq(t, tok, tokStored)
 			}
 		})
-		t.Run("Duplicate Login", func(t *testing.T) {
-			tok, ec := Login("bar", "barrrr")
-			testutil.ExpectDeepEq(t, tok, "")
-			testutil.ExpectDeepEq(t, ec, DuplicateLogin)
-		})
 	})
 }
 
@@ -144,14 +142,45 @@ func TestLogout(t *testing.T) {
 			database.StoreUser(u)
 		}
 		t.Run("Without Authentication", func(t *testing.T) {
-			ec := Logout("blabla", "dontwork")
+			ec := Logout("dontwork")
 			testutil.ExpectDeepEq(t, ec, InvalidToken)
 		})
 		t.Run("Logout Success", func(t *testing.T) {
 			tok, ec := Login("bar", "barrrr")
 			if ok(t, ec) {
-				ec = Logout("bar", tok)
+				ec = Logout(tok)
 				ok(t, ec)
+			}
+		})
+	})
+}
+
+func TestGetUser(t *testing.T) {
+	database.WithTestDB(func() {
+		users := []*entity.User{
+			{"foo", "fooooo", "foo@", "11"}, {"bar", "barrrr", "bar@", "22"},
+			{"baz", "bazzzz", "baz@", "33"}}
+		sort.Sort(entity.UserSlice(users))
+		for _, u := range users {
+			database.StoreUser(u)
+		}
+		var nilu *entity.User
+		t.Run("Without Authentication", func(t *testing.T) {
+			u, ec := GetUser("foo", "noSuchToken")
+			testutil.ExpectDeepEq(t, u, nilu)
+			testutil.ExpectDeepEq(t, ec, InvalidToken)
+		})
+		t.Run("With Authentication", func(t *testing.T) {
+			database.PutToken("foo", "nowwehavetoken")
+			u, ec := GetUser("foo", "nowwehavetoken")
+			cu, _ := database.GetUser("foo")
+			if ok(t, ec) {
+				sort.Sort(entity.UserSlice(users))
+				testutil.ExpectDeepEq(t, u, cu)
+			}
+			u, ec = GetUser("nosuchuser", "nowwehavetoken")
+			if ok(t, ec) {
+				testutil.ExpectDeepEq(t, u, nilu)
 			}
 		})
 	})

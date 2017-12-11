@@ -47,7 +47,7 @@ func getAllUsers(needLogin) ([]*entity.User, ErrorCode) {
 }
 
 // GetAllUsers ..
-func GetAllUsers(username, token string) ([]*entity.User, ErrorCode) {
+func GetAllUsers(token string) ([]*entity.User, ErrorCode) {
 	lp, ec := authenticate(token)
 	if ec != OK {
 		return nil, ec
@@ -55,10 +55,13 @@ func GetAllUsers(username, token string) ([]*entity.User, ErrorCode) {
 	return getAllUsers(*lp)
 }
 
-func removeUser(l needLogin) ErrorCode {
+func removeUser(username string, l needLogin) ErrorCode {
 	u, err := database.GetUsername(l.token)
 	if err != nil {
 		return DatabaseFail
+	}
+	if u != username {
+		return InvalidToken
 	}
 	err = database.RemoveUser(u)
 	if err != nil {
@@ -68,12 +71,12 @@ func removeUser(l needLogin) ErrorCode {
 }
 
 // RemoveUser ..
-func RemoveUser(token string) ErrorCode {
+func RemoveUser(username, token string) ErrorCode {
 	lp, ec := authenticate(token)
 	if ec != OK {
 		return ec
 	}
-	return removeUser(*lp)
+	return removeUser(username, *lp)
 }
 
 // Login ..
@@ -85,11 +88,7 @@ func Login(username, password string) (string, ErrorCode) {
 	if u == nil || u.Password != password {
 		return "", AuthenticationFail
 	}
-	t, err := database.GetToken(username)
-	if err == nil {
-		return "", DuplicateLogin
-	}
-	t = uniuri.New()
+	t := uniuri.New()
 	err = database.PutToken(username, t)
 	if err != nil {
 		return "", DatabaseFail
@@ -98,7 +97,7 @@ func Login(username, password string) (string, ErrorCode) {
 }
 
 // Logout ..
-func Logout(username, token string) ErrorCode {
+func Logout(token string) ErrorCode {
 	lp, ec := authenticate(token)
 	if ec != OK {
 		return ec
@@ -112,4 +111,17 @@ func logout(l needLogin) ErrorCode {
 		return DatabaseFail
 	}
 	return OK
+}
+
+// GetUser ..
+func GetUser(username, token string) (*entity.User, ErrorCode) {
+	_, ec := authenticate(token)
+	if ec != OK {
+		return nil, ec
+	}
+	u, err := database.GetUser(username)
+	if err != nil {
+		return nil, DatabaseFail
+	}
+	return u, OK
 }
