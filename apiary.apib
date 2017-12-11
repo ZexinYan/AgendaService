@@ -18,7 +18,7 @@ Some common responses:
 + Response 200 (application/json)
 
         {
-            "message":"OK"
+            "message":"OK",
             "data":
                     ...
         }
@@ -26,25 +26,22 @@ Some common responses:
 + Response 400 (application/json)
 
         {
-            "message":"{parameter1, ...}"
-            "data":
-                    ...
+            "message":"{parameter1, ...}",
+            "data": null
         }
         
 + Response 500 (application/json)
 
         {
-            "message":"Internal Server Error"
-            "data":
-                    ...
+            "message":"Internal Server Error",
+            "data": null
         }
 
 + Response 501 (application/json)
 
         {
-            "message":"Not Implement"
-            "data":
-                    ...
+            "message":"Not Implement",
+            "data": null
         }
   
 # Group Access Authorization and Control
@@ -62,8 +59,8 @@ The Authorization Resource has the following attribute:
 Response Code and Message:
 Code | Message      | description
 ---- | -------      | -----------
-200  | OK           | log in/out successfully
-204  | No Content   | delete successfully
+200  | OK           | log in successfully
+204  | No Content   | log out successfully
 401  | Unauthorized | log out fail
 403  | Forbidden    | log in fail
 
@@ -78,7 +75,7 @@ Get an Authentication token for operations later.
 + Response 200 (application/json)
 
         {
-            "message":"OK"
+            "message":"OK",
             "data":
                     {
                         "token":"1a2b3c"
@@ -88,11 +85,8 @@ Get an Authentication token for operations later.
 + Response 403 (application/json)
 
         {
-            "message":"Forbidden"
-            "data":
-                    {
-                        "token":""
-                    }
+            "message":"Forbidden",
+            "data": null
         }
 
 
@@ -108,11 +102,8 @@ Remove an Authorization token from database.
 + Response 401 (application/json)
 
         {
-            "message":"Unauthorized"
-            "data":
-                    {
-                        "token":""
-                    }
+            "message":"Unauthorized",
+            "data": null
         }
 
 
@@ -147,11 +138,11 @@ Return a specific user with username.
 + Response 200 (application/json)
 
         {
-            "message":"OK"
+            "message":"OK",
             "data":
                     {
-                        "username":"VinaLx"
-                        "email":"VinaLx@mail2.sysu.edu.cn"
+                        "username":"VinaLx",
+                        "email":"VinaLx@mail2.sysu.edu.cn",
                         "phone":"13766666666"
                     }
         }
@@ -159,13 +150,8 @@ Return a specific user with username.
 + Response 404 (application/json)
 
         {
-            "message":"Not Found"
-            "data":
-                    {
-                        "username":""
-                        "email":""
-                        "phone":""
-                    }
+            "message":"Not Found",
+            "data": null
         }
 
 ### Delete A User [DELETE]
@@ -177,13 +163,8 @@ To delete the user account with username from database.
 + Response 404 (application/json)
 
         {
-            "message":"Not Found"
-            "data":
-                    {
-                        "username":""
-                        "email":""
-                        "phone":""
-                    }
+            "message":"Not Found",
+            "data": null
         }
 
 
@@ -233,12 +214,7 @@ To create a new account. It takes a JSON object containing a username, a passwor
 
         {
             "message":"Conflict"
-            "data":
-                    {
-                        "username":""
-                        "email":""
-                        "phone":""
-                    }
+            "data": null
         }
 
 ### List all Users [GET]
@@ -274,5 +250,5 @@ To view all the users.
 
         {
             "message":"Unauthorized"
-            "data":[]
+            "data": null
         }
