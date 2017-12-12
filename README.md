@@ -13,7 +13,7 @@ Agenda is a command line meeting manager.
 
 ## Docker Integration
 
-[AgendaService on dockerhub]()
+[AgendaService on dockerhub](https://hub.docker.com/r/vinalx/agendaservice/)
 
 ```
 docker pull vinalx/AgendaService
