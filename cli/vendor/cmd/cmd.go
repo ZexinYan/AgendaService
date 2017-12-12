@@ -12,12 +12,11 @@ import (
 	"os"
 )
 
-var baseUrl = "http://0.0.0.0:8080"
-
 type Resp struct {
 	Message string
 	Data    map[string]string
 }
+
 type UserList struct {
 	Message string
 	Data    []map[string]string
@@ -38,14 +37,14 @@ func printUser(user map[string]string) {
 }
 
 // Register a user
-func Register(user, pass, mail, phone string) int {
+func Register(user, pass, mail, phone, baseURL string) int {
 	// Send HTTP
 	data := make(url.Values)
 	data["username"] = []string{user}
 	data["password"] = []string{pass}
 	data["email"] = []string{mail}
 	data["phone"] = []string{phone}
-	resp, err := http.PostForm(baseUrl + "/v1/users", data)
+	resp, err := http.PostForm(baseURL + "/v1/users", data)
 
 	if err != nil {
 		utils.PrintError(err.Error())
@@ -75,12 +74,12 @@ func Register(user, pass, mail, phone string) int {
 }
 
 // ShowUsers print all users when logged in
-func ShowUsers() int {
+func ShowUsers(baseURL string) int {
 	if utils.LoginCheck() {
 		// HTTP
 		t := utils.GetToken()
 		client := &http.Client{}
-		req, _ := http.NewRequest("GET", baseUrl+"/v1/users?token="+t, nil)
+		req, _ := http.NewRequest("GET", baseURL+"/v1/users?token="+t, nil)
 
 		resp, err := client.Do(req)
 		if err != nil {
@@ -119,9 +118,9 @@ func ShowUsers() int {
 }
 
 // Login Command
-func Login(user, pass string) int {
+func Login(user, pass, baseURL string) int {
 	client := &http.Client{}
-	req, err := http.NewRequest("GET", baseUrl+"/v1/auth?username="+user+"&password="+pass, nil)
+	req, err := http.NewRequest("GET", baseURL+"/v1/auth?username="+user+"&password="+pass, nil)
 	resp, err := client.Do(req)
 
 	if err != nil {
@@ -158,11 +157,11 @@ func Login(user, pass string) int {
 }
 
 // Logout Command
-func Logout() int {
+func Logout(baseURL string) int {
 	if utils.LoginCheck() {
 		t := utils.GetToken()
 		client := &http.Client{}
-		req, _ := http.NewRequest("DELETE", baseUrl+"/v1/auth?token="+t, nil)
+		req, _ := http.NewRequest("DELETE", baseURL+"/v1/auth?token="+t, nil)
 
 		resp, err := client.Do(req)
 		if err != nil {
@@ -200,11 +199,11 @@ func Logout() int {
 }
 
 // DeleteUser delete current login user, and removed from its meeting
-func DeleteUser(username string) int {
+func DeleteUser(username, baseURL string) int {
 	if utils.LoginCheck() {
 		t := utils.GetToken()
 		client := &http.Client{}
-		req, _ := http.NewRequest("DELETE", baseUrl+"/v1/users/" + username + "?token="+t, nil)
+		req, _ := http.NewRequest("DELETE", baseURL+"/v1/users/" + username + "?token="+t, nil)
 
 		resp, err := client.Do(req)
 		if err != nil {
@@ -241,11 +240,11 @@ func DeleteUser(username string) int {
 	return 0
 }
 
-func ShowInfo(username string) int {
+func ShowInfo(username, baseURL string) int {
 	if utils.LoginCheck() {
 		t := utils.GetToken()
 		client := http.Client{}
-		req, _ := http.NewRequest("GET", baseUrl+"/v1/users/" + username + "?token="+t, nil)
+		req, _ := http.NewRequest("GET", baseURL+"/v1/users/" + username + "?token="+t, nil)
 
 		resp, err := client.Do(req)
 
@@ -277,7 +276,7 @@ func ShowInfo(username string) int {
 
 		return 1
 	} else {
-		fmt.Println("Please Login first!")
-		return 1
+	fmt.Println("Please Login first!")
+	return 1
 	}
 }
