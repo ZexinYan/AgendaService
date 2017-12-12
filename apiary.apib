@@ -1,48 +1,10 @@
 FORMAT: 1A
-HOST: https://localhost:8080
+HOST: (https://localhost:8080) with ngrok
 
 # AgendaService
 
 AgendaService is a simple API allowing users to manage their schedules online.
 
-Common Response Code and Message:
-Code | Message               | description
----- | -------               | -----------
-200  | OK                    | the request has succeeded
-400  | {parameter1, ...}     | missing parameters
-500  | Internal Server Error | Internal server error occurs
-501  | Not Implement         | server does not support the functionality
-
-Some common responses:
-
-+ Response 200 (application/json)
-
-        {
-            "message":"OK",
-            "data":
-                    ...
-        }
-
-+ Response 400 (application/json)
-
-        {
-            "message":"{parameter1, ...}",
-            "data": null
-        }
-        
-+ Response 500 (application/json)
-
-        {
-            "message":"Internal Server Error",
-            "data": null
-        }
-
-+ Response 501 (application/json)
-
-        {
-            "message":"Not Implement",
-            "data": null
-        }
   
 # Group Access Authorization and Control
 
@@ -59,8 +21,7 @@ The Authorization Resource has the following attribute:
 Response Code and Message:
 Code | Message      | description
 ---- | -------      | -----------
-200  | OK           | log in successfully
-204  | No Content   | log out successfully
+200  | OK           | log in/out successfully
 401  | Unauthorized | log out fail
 403  | Forbidden    | log in fail
 
@@ -72,10 +33,12 @@ Get an Authentication token for operations later.
     - username : `VinaLx` (string, required) - User Name
     - password : `vpass` (string, required) - User Password
 
+
+
 + Response 200 (application/json)
 
         {
-            "message":"OK",
+            "message":"OK"
             "data":
                     {
                         "token":"1a2b3c"
@@ -85,8 +48,11 @@ Get an Authentication token for operations later.
 + Response 403 (application/json)
 
         {
-            "message":"Forbidden",
-            "data": null
+            "message":"Forbidden"
+            "data":
+                    {
+                        "token":""
+                    }
         }
 
 
@@ -102,8 +68,11 @@ Remove an Authorization token from database.
 + Response 401 (application/json)
 
         {
-            "message":"Unauthorized",
-            "data": null
+            "message":"Unauthorized"
+            "data":
+                    {
+                        "token":""
+                    }
         }
 
 
@@ -117,20 +86,15 @@ A User object has the following attributes:
 + phone (string)
 
 
-## User [/v1/users/{username}{?token}]
+## User [/v1/users/{username}]
 
 It contains the operations of a user object.
 
 Response Code and Reason:
-Code | Message      | description
----- | -------      | -----------
-200  | OK           | retrive successfully
-204  | No Content   | delete successfully
-401  | Unauthorized | authorization fail
-404  | Not Found    | no such user
-
-+ Parameters
-    - token : `1a2b3c` (string, required) - Auth Token
+Code | Message   | description
+---- | -------   | -----------
+200  | OK        | retrive/delete successfully
+404  | Not Found | no such user
 
 ### Retrive A User [GET]
 
@@ -139,27 +103,27 @@ Return a specific user with username.
 + Response 200 (application/json)
 
         {
-            "message":"OK",
+            "message":"OK"
             "data":
                     {
-                        "username":"VinaLx",
-                        "email":"VinaLx@mail2.sysu.edu.cn",
+                        "username":"VinaLx"
+                        "password":"vpass"
+                        "email":"VinaLx@mail2.sysu.edu.cn"
                         "phone":"13766666666"
                     }
         }
-
-+ Response 401 (application/json)
-
-        {
-            "message":"Unauthorized",
-            "data": null
-        }
-
+        
 + Response 404 (application/json)
 
         {
-            "message":"Not Found",
-            "data": null
+            "message":"Not Found"
+            "data":
+                    {
+                        "username":""
+                        "password":""
+                        "email":""
+                        "phone":""
+                    }
         }
 
 ### Delete A User [DELETE]
@@ -171,8 +135,14 @@ To delete the user account with username from database.
 + Response 404 (application/json)
 
         {
-            "message":"Not Found",
-            "data": null
+            "message":"Not Found"
+            "data":
+                    {
+                        "username":""
+                        "password":""
+                        "email":""
+                        "phone":""
+                    }
         }
 
 
@@ -183,8 +153,7 @@ It contains the operations of a users collection.
 Response Code and Reason:
 Code | Message      | description
 ---- | -------      | -----------
-200  | OK           | list successfully
-201  | Created      | create successfully
+200  | OK           | create/list successfully
 401  | Unauthorized | have not log in
 409  | Conflict     | the username already exists
 
@@ -213,6 +182,7 @@ To create a new account. It takes a JSON object containing a username, a passwor
             "data":
                     {
                         "username":"VinaLx"
+                        "password":"vpass"
                         "email":"VinaLx@mail2.sysu.edu.cn"
                         "phone":"13766666666"
                     }
@@ -222,7 +192,13 @@ To create a new account. It takes a JSON object containing a username, a passwor
 
         {
             "message":"Conflict"
-            "data": null
+            "data":
+                    {
+                        "username":""
+                        "password":""
+                        "email":""
+                        "phone":""
+                    }
         }
 
 ### List all Users [GET]
@@ -235,19 +211,22 @@ To view all the users.
 + Response 200 (application/json)
 
         {
-            "message":"OK"
+            "message":"Created"
             "data":
                     [
                         {
                             "username":"VinaLx"
+                            "password":"vpass"
                             "email":"VinaLx@mail2.sysu.edu.cn"
                             "phone":"13766666666"
                         }, {
                             "username":"ZexinYan"
+                            "password":"zpass"
                             "email":"ZexinYan@mail2.sysu.edu.cn"
                             "phone":"13866666666"
                         }, {
                             "username":"Jarvis"
+                            "password":"jpass"
                             "email":"Jarvis@mail2.sysu.edu.cn"
                             "phone":"13966666666"
                         }
@@ -258,5 +237,5 @@ To view all the users.
 
         {
             "message":"Unauthorized"
-            "data": null
+            "data":[]
         }
