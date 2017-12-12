@@ -9,8 +9,9 @@ VOLUME "/go/db/"
 
 COPY . /go/src/AgendaService
 
-ENV http_proxy="socks5://192.168.199.116:4321" \
-    https_proxy="socks5://192.168.199.116:4321"
+# use only on local test
+# ENV http_proxy="socks5://192.168.199.116:4321" \
+#   https_proxy="socks5://192.168.199.116:4321"
 
 RUN go get -v AgendaService/service AgendaService/cli && \
     go install AgendaService/service && go install AgendaService/cli
