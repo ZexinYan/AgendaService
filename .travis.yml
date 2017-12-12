@@ -1,0 +1,12 @@
+language: go
+
+go:
+- tip # The latest version of Go.
+
+script:
+  - go build service/main.go
+  - go build cli/main.go
+
+branches:
+  only:
+    - master
