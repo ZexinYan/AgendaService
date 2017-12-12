@@ -4,12 +4,59 @@
 
 Agenda is a command line meeting manager.
 
-## Examples
+## Travis Testing
 
-### Helper
+[.travis.yml]()
+
+- Build `service` and `cli`
+- Run tests of `service` and `cli`
+
+## Docker Integration
+
+[AgendaService on dockerhub]()
 
 ```
-➜  cli git:(master) ✗ ./cli 
+docker pull vinalx/AgendaService
+```
+
+### Start client in docker
+
+```
+$ docker run --rm agenda-service client -h
+Agenda is a meeting manager based on CLI using cobra library.
+It supports different operation on meetings including register, create meeting, query and so on.
+It's a cooperation homework assignment for service computing.
+
+...
+```
+
+### Start server in docker
+
+```
+$ docker run --rm --volume "dbdir:/go/db/" agenda-service server -h
+flag needs an argument: 'h' in -h
+Usage of /go/bin/service:
+  -d, --db string
+    	Path to the sqlite db file (default "agenda.db")
+  -h, --host string
+    	Host of the server listening on (default "0.0.0.0")
+  -p, --port value
+    	Port of the server listening on (default 8080)
+```
+
+## Usage Examples
+
+```
+go get -v github.com/ZexinYan/AgendaService/service
+go get -v github.com/ZexinYan/AgendaService/service
+```
+
+or use docker
+
+### Help
+
+```
+$ ./cli
 Agenda is a meeting manager based on CLI using cobra library.
 It supports different operation on meetings including register, create meeting, query and so on.
 It's a cooperation homework assignment for service computing.
@@ -39,7 +86,7 @@ Use "Agenda [command] --help" for more information about a command.
 ### Create User
 
 ```
-➜  cli git:(master) ✗ ./cli register -h
+$ ./cli register -h
 You need to provide username and password to register, and the username can't be the same as others.
 
 Usage:
@@ -67,34 +114,34 @@ phone: 15626411416
 If the username hasn't been registered, then you will succeed.
 
 ```
-➜  cli git:(master) ✗ ./cli register -u yanzexin -p 123 -m yzx9610@outlook.com -t 15626411416
+$ ./cli register -u yanzexin -p 123 -m yzx9610@outlook.com -t 15626411416
 Register Succeed
 ```
 
 However, if the username has been registered, then you will fail.
 
 ```
-➜  cli git:(master) ✗ ./cli register -u yanzexin -p 123 -m yzx9610@outlook.com -t 15626411416
+$ ./cli register -u yanzexin -p 123 -m yzx9610@outlook.com -t 15626411416
 Conflict
 ```
 
 ### Login
 
 ```
-➜  cli git:(master) ✗ ./cli login -u yanzexin -p 123
+$ ./cli login -u yanzexin -p 123
 Login Succeed
 ```
 
 
 ```
-➜  cli git:(master) ✗ ./cli login -u yanzexin -p 1234
+$ ./cli login -u yanzexin -p 1234
 Forbidden
 ```
 
 ### Log out
 
 ```
-➜  cli git:(master) ✗ ./cli logout
+$ ./cli logout
 Log Out Succeed!
 ```
 
@@ -102,14 +149,14 @@ Log Out Succeed!
 If you want to retrieve the information, you have to log in first.
 
 ```
-➜  cli git:(master) ✗ ./cli info -u yanzexin
+$ ./cli info -u yanzexin
 Please Login first!
 ```
 
 You can get the information about yourself...
 
 ```
-➜  cli git:(master) ✗ ./cli info -u yanzexin
+$ ./cli info -u yanzexin
 {
 	"email": "yzx9610@outlook.com",
 	"phone": "15626411416",
@@ -120,7 +167,7 @@ You can get the information about yourself...
 Or?
 
 ```
-➜  cli git:(master) ✗ ./cli info -u yan     
+$ ./cli info -u yan
 {
 	"email": "mail",
 	"phone": "1234",
@@ -131,7 +178,7 @@ Or?
 ### Show all users
 
 ```
-➜  cli git:(master) ✗ ./cli list
+$ ./cli list
 {
 	"email": "mail",
 	"phone": "1234",
@@ -149,17 +196,18 @@ Actually, we don't recommend you to do that, but if you want...
 
 
 ```
-➜  cli git:(master) ✗ ./cli delete -u yanzexin
+$ ./cli delete -u yanzexin
 Delete User Succeed!
 ```
 
 Then, you will lose all of your data in Agenda.
 
 ## Test
+
 ### CLI
 
 ```
-➜  cmd git:(master) ✗ go test
+$ go test
 Testing Register...
 Register Succeed
 Testing Login...
@@ -194,4 +242,11 @@ ok      github.com/AgendaService/cli/vendor/cmd 0.028s
 
 ```
 
+### Server
 
+```
+$ go test ./service/vendor/model
+ok  	homework/sc/AgendaService/service/vendor/model	0.051s
+$ go test ./service/vendor/database
+ok  	homework/sc/AgendaService/service/vendor/database	0.095s
+```
