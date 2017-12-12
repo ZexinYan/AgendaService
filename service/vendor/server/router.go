@@ -173,7 +173,7 @@ func addUserHandler() http.HandlerFunc {
 			}
 			switch model.CreateUser(u) {
 			case model.OK:
-				return ok(u)
+				return newResponse(201, "Created", u)
 			case model.DuplicateUser:
 				return notOK(409, "Conflict")
 			default:
