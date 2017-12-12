@@ -15,11 +15,45 @@
 package main
 
 import (
-	"cli"
-	"model"
+	//"model"
+	//"cli"
+	"encoding/json"
+	"utils"
+	"fmt"
+	"bytes"
+	"os"
 )
 
+type UserList struct {
+	Message string
+	Data    []map[string]string
+}
+
+func printUser(user map[string]string) {
+	b, err := json.Marshal(user)
+	if err != nil {
+		fmt.Println(err)
+	}
+	var out bytes.Buffer
+	err = json.Indent(&out, b, "", "\t")
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	out.WriteTo(os.Stdout)
+	fmt.Println()
+}
+
 func main() {
-	model.EnsureAgendaDir()
-	cli.Execute()
+	body := "{\"message\": \"OK\", \"data\":[{\"1\":\"2\", \"3\": \"4\"}, {\"1\": \"3\"}]}"
+	r := &UserList{}
+	err := json.Unmarshal([]byte(string(body)), &r)
+	if err != nil {
+		utils.PrintError(err.Error())
+	}
+	for i := 0; i < len(r.Data); i++ {
+		printUser(r.Data[i])
+	}
+
+	//model.EnsureAgendaDir()
+	//cli.Execute()
 }
