@@ -218,7 +218,7 @@ func DeleteUser(username string) int {
 		}
 
 		if resp.StatusCode == 204 {
-			fmt.Println("Delete User Failed")
+			fmt.Println("Delete User Succeed!")
 			return 0
 		}
 
