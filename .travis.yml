@@ -1,0 +1,11 @@
+language: go
+
+go:
+- tip # The latest version of Go.
+
+script:
+  - go run main.go
+
+branches:
+  only:
+    - master
