@@ -1,5 +1,5 @@
 # Agenda
 
-![pass](https://api.travis-ci.org/ZexinYan/service-computing-homework.svg?branch=master)
+![TravisCI](https://travis-ci.org/Ace-0/AgendaService.svg?branch=master)
 
 Agenda is a command line meeting manager.
