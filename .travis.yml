@@ -4,7 +4,7 @@ go:
 - tip # The latest version of Go.
 
 script:
-  - go run main.go
+  - go run service/main.go
 
 branches:
   only:
