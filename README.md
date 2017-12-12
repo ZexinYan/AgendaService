@@ -27,10 +27,12 @@ Available Commands:
   register    Register user.
 
 Flags:
-  -d, --debug   display log message
-  -h, --help    help for Agenda
+  -b, --baseUrl string   Specify the server url. (default "http://0.0.0.0:8080")
+  -d, --debug            display log message
+  -h, --help             help for Agenda
 
 Use "Agenda [command] --help" for more information about a command.
+
 ```
 
 
