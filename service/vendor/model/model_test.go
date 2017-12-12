@@ -27,11 +27,13 @@ func TestCreateUser(t *testing.T) {
 		now := make([]*entity.User, 0)
 		for _, u := range users {
 			now = append(now, u)
-			CreateUser(u)
-			us, _ := database.GetAllUsers()
-			sort.Sort(entity.UserSlice(now))
-			sort.Sort(entity.UserSlice(us))
-			testutil.ExpectDeepEq(t, us, now)
+			ec := CreateUser(u)
+			if ok(t, ec) {
+				us, _ := database.GetAllUsers()
+				sort.Sort(entity.UserSlice(now))
+				sort.Sort(entity.UserSlice(us))
+				testutil.ExpectDeepEq(t, us, now)
+			}
 		}
 		t.Run("Should Duplicate", func(t *testing.T) {
 			ec := CreateUser(&entity.User{Username: "foo"})

@@ -16,7 +16,7 @@ const createUserTableSQL = `CREATE TABLE IF NOT EXISTS User (
 const createLoginTableSQL = `CREATE TABLE IF NOT EXISTS Login (
 	token TEXT NOT NULL PRIMARY KEY,
 	username TEXT NOT NULL,
-	FOREIGN KEY(username) REFERENCES User(username)
+	FOREIGN KEY(username) REFERENCES User(username) ON DELETE CASCADE
 );`
 
 type sqlWork func(db *sql.DB)

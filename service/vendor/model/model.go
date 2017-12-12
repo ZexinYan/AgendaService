@@ -3,6 +3,7 @@ package model
 import (
 	"database"
 	"entity"
+	"log"
 
 	"github.com/dchest/uniuri"
 )
@@ -29,6 +30,9 @@ func CreateUser(u *entity.User) ErrorCode {
 		return DatabaseFail
 	}
 	if uu != nil {
+		log.Printf(
+			"Duplicate: (%s,%s,%s,%s)",
+			uu.Username, uu.Password, uu.Email, uu.Phone)
 		return DuplicateUser
 	}
 	err = database.StoreUser(u)
@@ -63,6 +67,7 @@ func removeUser(username string, l needLogin) ErrorCode {
 	if u != username {
 		return InvalidToken
 	}
+	logout(l)
 	err = database.RemoveUser(u)
 	if err != nil {
 		return DatabaseFail

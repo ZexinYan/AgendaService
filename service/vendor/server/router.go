@@ -83,7 +83,7 @@ func withCheckParameter(
 			if checkParameter(w, r.Form, required...) {
 				resp := h(r)
 				if resp != nil {
-					responseJSON(w, h(r))
+					responseJSON(w, resp)
 				} else {
 					w.WriteHeader(http.StatusNoContent)
 				}
