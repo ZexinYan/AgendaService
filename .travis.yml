@@ -6,6 +6,9 @@ go:
 script:
   - go build service/main.go
   - go build cli/main.go
+  - go test ./service/vendor/database
+  - go test ./service/vendor/model
+  - go test ./cli/vendor/cmd
 
 branches:
   only:
